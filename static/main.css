@@ -67,4 +67,5 @@
     text-align: left;
     border: 2px solid red;
     float: left;
+    word-wrap: break-word;
 }

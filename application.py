@@ -11,8 +11,6 @@ from models import *
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
-
-
 socketio = SocketIO(app)
 
 
@@ -33,14 +31,13 @@ global username
 def index():
     return render_template("index.html")
 
-@app.route("/register",methods=["GET","POST"])
-def register():
-    if request.method=="GET":
-        return render_template("register.html")
-    else:
-        username=request.form.get("username")
-        password=request.form.get("password")
-        user=Login(username=username,password=password)
-        db.session.add(user)
-        db.session.commit()
-        return redirect("/")
+
+@socketio.on("send")
+def send_msg(data):
+    print("hell")
+    print(data)
+
+
+if __name__ == '__main__':
+
+    app.run()
