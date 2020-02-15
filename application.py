@@ -19,7 +19,7 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-global username
+history={}
 @app.route("/",methods=["GET","POST"])
 def index():
     return render_template("index.html")
@@ -27,8 +27,15 @@ def index():
 
 @socketio.on("send")
 def send_msg(data):
-    print("hell")
     print(data)
+    ch_name=data['ch_name']
+    if ch_name in history:
+        # append the new number to the existing array at this slot
+        history[ch_name].append(data['message'])
+    else:
+        # create a new array in this slot
+        history[ch_name] = [data['message']]
+    print(history)
 
 
 if __name__ == '__main__':

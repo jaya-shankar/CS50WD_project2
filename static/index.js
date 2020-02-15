@@ -22,16 +22,16 @@ document.addEventListener('DOMContentLoaded',function (){
             let channels=document.querySelector("#Schannel").options;
             for(i=0;i<channels.length;i++){
                 if(ch_name.value==channels[i].value){
-                    selectCh(ch_name.value);
+                    selectCh(ch_name);
                     localStorage.setItem("ch_name",ch_name);
                     return false;
                 }
             }
             let option=document.createElement("option");
-            option.setAttribute('value',ch_name.value);
-            option.innerHTML=ch_name.value;
+            option.setAttribute('value',ch_name);
+            option.innerHTML=ch_name;
             document.querySelector("#Schannel").append(option);
-            selectCh(ch_name.value);
+            selectCh(ch_name);
             localStorage.setItem("ch_name",ch_name);
             ch_name.innerHTML="";
         }
@@ -52,8 +52,8 @@ document.addEventListener('DOMContentLoaded',function (){
         let msg=document.querySelector("#msg");
         if(msg.value=="")
             return false;
-        let message={'user':name,'msg':msg.value,'time':time,'ch_name':ch_name};
-        socket.emit('send',{'message':message});
+        let message={'user':name,'msg':msg.value,'time':time};
+        socket.emit('send',{'message':message,'ch_name':ch_name});
         let scroller=document.querySelector("#chatbox");
         scroller.scrollTop = scroller.scrollHeight;
         msg.value="";
