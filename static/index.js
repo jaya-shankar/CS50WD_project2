@@ -59,19 +59,37 @@ document.addEventListener('DOMContentLoaded',function (){
         msg.value="";
         return false;
     };
+    function selectCh(ch_name){
+
+        document.querySelector("#ch_name").innerHTML=ch_name;
+        document.querySelector("#chatbox").style.visibility="visible";
+        document.querySelector("#msgs").innerHTML="";
+        socket.emit('get_chat',{'ch_name':ch_name});
+
+    };
 
 });
 
-    function selectCh(ch_name){
 
-            document.querySelector("#ch_name").innerHTML=ch_name;
-            document.querySelector("#chatbox").style.visibility="visible";
-            document.querySelector("#msgs").innerHTML="";
+    socket.on('display_msg',function(data){
+        let div=CreateTextMsg(data['message']);
+        if(ch_name==data['ch_name']){
+            document.querySelector('#msgs').append(div);
+        }
+    });
 
-    };
-    function CreateTextMsg(name,msg){
-        let today=new Date();
-        let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    socket.on('load_chat',function(data){
+        let div;
+        let i;
+        console.log(data);
+        for(i=0;i<data.length;i++){
+            div=CreateTextMsg(data[i]);
+            document.querySelector('#msgs').append(div);
+        }
+    
+    });
+
+    function CreateTextMsg(data){
         let div=document.createElement("div");
         let pm = document.createElement("p");
         let pu = document.createElement("p");
@@ -83,9 +101,9 @@ document.addEventListener('DOMContentLoaded',function (){
         div.appendChild(pu);
         div.appendChild(pm);
         div.appendChild(tim);
-        tim.innerHTML=time;
-        pu.innerHTML=name
-        pm.innerHTML=msg.value;
+        tim.innerHTML=data['time'];
+        pu.innerHTML=data['user']
+        pm.innerHTML=data['msg'];
         return div;
     };
 });

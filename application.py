@@ -27,15 +27,25 @@ def index():
 
 @socketio.on("send")
 def send_msg(data):
-    print(data)
     ch_name=data['ch_name']
     if ch_name in history:
         # append the new number to the existing array at this slot
+        if(len(history[ch_name])>5):
+            history[ch_name].pop(0)
         history[ch_name].append(data['message'])
     else:
         # create a new array in this slot
         history[ch_name] = [data['message']]
-    print(history)
+    emit('display_msg',data,broadcast=True)
+
+@socketio.on("get_chat")
+def get_chat(data):
+    ch_name=data['ch_name']
+    if ch_name not in history:
+        history[ch_name]=[]
+    chats=history[ch_name]
+    emit('load_chat',chats,broadcast=True)
+
 
 
 if __name__ == '__main__':
