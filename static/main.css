@@ -61,11 +61,19 @@
     font-size: 4;
 }
 
-.text_box{
+.left_text_box{
     box-sizing: border-box;
     width: 60%;
     text-align: left;
     border: 2px solid red;
     float: left;
+    word-wrap: break-word;
+}
+.right_text_box{
+    box-sizing: border-box;
+    width: 60%;
+    text-align: left;
+    border: 2px solid green;
+    float: right;
     word-wrap: break-word;
 }

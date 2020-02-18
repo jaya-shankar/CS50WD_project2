@@ -7,7 +7,6 @@ from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 import requests
-from models import *
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
@@ -30,7 +29,7 @@ def send_msg(data):
     ch_name=data['ch_name']
     if ch_name in history:
         # append the new number to the existing array at this slot
-        if(len(history[ch_name])>5):
+        if(len(history[ch_name])>50):
             history[ch_name].pop(0)
         history[ch_name].append(data['message'])
     else:
@@ -46,7 +45,18 @@ def get_chat(data):
     chats=history[ch_name]
     emit('load_chat',chats,broadcast=True)
 
+@socketio.on("add_channel")
+def add_channel(data):
+    ch_name=data['ch_name']
+    history[ch_name]=[]
+    emit('load_channel',data,broadcast=True)
 
+@socketio.on('get_channels')
+def get_channels():
+    ch_list=[]
+    for key in history.keys(): 
+        ch_list.append(key) 
+    emit("load_channels",ch_list)
 
 if __name__ == '__main__':
 

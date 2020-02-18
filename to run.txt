@@ -1,0 +1,6 @@
+to run
+set flask_app
+and then flask run
+
+if JS is not updating
+then reload chrome page using Cmd+shift+R
