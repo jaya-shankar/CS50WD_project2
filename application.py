@@ -19,6 +19,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 history={}
+usernames=[]
 @app.route("/",methods=["GET","POST"])
 def index():
     return render_template("index.html")
@@ -56,7 +57,15 @@ def get_channels():
     ch_list=[]
     for key in history.keys(): 
         ch_list.append(key) 
-    emit("load_channels",ch_list)
+    emit("load_channels",ch_list,broadcast=True)
+
+@socketio.on('add,Get_username')
+def Get_username(data):
+    user=data['username']
+    usernames.append(user)
+    print(usernames)
+    emit("load_usernames",usernames,broadcast=True)
+
 
 if __name__ == '__main__':
 

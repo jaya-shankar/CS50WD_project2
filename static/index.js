@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded',function (){
     let name=prompt("Enter your name");
     let ch_name;
-
+    localStorage.clear();
     let socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
-    
+
     socket.on('connect', () => {
     if(!localStorage.getItem("ch_name"))
     {
@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded',function (){
     }
     document.querySelector("#greet").innerHTML="Hello "+"<b>"+name+"</b>";
     socket.emit('get_channels');
+    socket.emit('add,Get_username',{'username':name});
     console.log("after get_channel")
     
     document.querySelector("#createCh").onsubmit=function(){
@@ -55,6 +56,31 @@ document.addEventListener('DOMContentLoaded',function (){
         return false;
     };
 
+    document.querySelector("#PersonalChat").onsubmit=function(){
+        console.log("PersonalChat called");
+        ch_name=document.querySelector("#talkto").value;
+        let key=ch_name;
+        ch_name=name+ch_name;
+        if(name.length>key.length)
+            ch_name=key+name;
+        else if(name.length<key.length)
+            ch_name=name+key;
+        else{
+            for(i=0;i<name.length;i++){
+                if(name[i]>key[i])
+                    ch_name=key+name;
+                else if(name[i]<key[i])
+                    ch_name=name+key;
+            };
+
+        };
+        selectCh(ch_name);
+        document.querySelector("#ch_name").innerHTML=key;
+        console.log("selected chname: "+ch_name)
+        localStorage.setItem("ch_name",key);
+        return false;
+    };
+
     document.querySelector("#send_msg").onsubmit=function(){
         let today=new Date();
         let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
@@ -62,6 +88,7 @@ document.addEventListener('DOMContentLoaded',function (){
         if(msg.value=="")
             return false;
         let message={'user':name,'msg':msg.value,'time':time};
+        console.log(ch_name);
         socket.emit('send',{'message':message,'ch_name':ch_name});
         let scroller=document.querySelector("#chatbox");
         scroller.scrollTop = scroller.scrollHeight;
@@ -95,6 +122,7 @@ document.addEventListener('DOMContentLoaded',function (){
     socket.on('load_chat',function(data){
         let div;
         let i;
+        console.log(data);
         for(i=0;i<data.length;i++){
             div=CreateTextMsg(data[i]);
             document.querySelector('#msgs').append(div);
@@ -121,6 +149,18 @@ document.addEventListener('DOMContentLoaded',function (){
 
     });
 
+    socket.on('load_usernames',function(data){
+        let x=document.querySelector('#talkto');
+        removeOptions(x);
+        for(i=0;i<data.length;i++){
+            let option=document.createElement("option");
+            option.setAttribute('value',data[i]);
+            option.innerHTML=data[i];
+            console.log(data[i])
+            document.querySelector("#talkto").append(option);
+        };
+    })
+
     function CreateTextMsg(data){
         let div=document.createElement("div");
         let pm = document.createElement("p");
@@ -144,4 +184,11 @@ document.addEventListener('DOMContentLoaded',function (){
         pm.innerHTML=data['msg'];
         return div;
     };
+
+    function removeOptions(selectbox){
+        var i;
+        for(i = selectbox.options.length - 1 ; i >= 0 ; i--){
+        selectbox.remove(i);
+        }
+    }
 });
